@@ -1,25 +1,48 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import NavBar from './components/Navbar.jsx';
+import Homepage from './pages/Homepage.jsx';
+import About from './pages/About.jsx';
+import Projects from './pages/Projects.jsx';
+import Contact from './pages/Contact.jsx';
+import Personal from './pages/Personal.jsx';
 
 function App() {
+  const [showNavbar, setShowNavbar] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const aboutSection = document.getElementById('about');
+      if (!aboutSection) return;
+
+      const aboutSectionTop = aboutSection.offsetTop;
+      const scrollY = window.scrollY;
+      const windowInnerHeight = window.innerHeight;
+
+      if (scrollY > aboutSectionTop - windowInnerHeight / 2) {
+        setShowNavbar(true);
+      } else {
+        setShowNavbar(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Homepage />
+      <NavBar slideOut={!showNavbar} />
+      <About />
+      <Projects />
+      <Contact />
+      <Personal />
     </div>
   );
 }
 
 export default App;
+

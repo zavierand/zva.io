@@ -15,3 +15,34 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* adding animations */
+@keyframes slideInFromLeft {
+  0% {
+      transform: translateX(-100%);
+  }
+  100% {
+      transform: translateX(0);
+  }
+}
+
+/* animations */
+.slide-in-from-left {
+  animation: slideInFromLeft 1s ease forwards;
+}
+
+.slide-out-to-right {
+  transform: translateX(100%);
+}
+
+.transition-transform {
+  transition: transform 0.5s;
+}
+
+.translate-x-full {
+  transform: translateX(100%);
+}
+
+.translate-x-0 {
+  transform: translateX(0);
+}
