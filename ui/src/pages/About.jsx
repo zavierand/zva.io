@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Card from '../components/Card.jsx';
 
 export default function About() {
-    const apiUrl = process.env.REACT_APP_ABOUT; // Corrected environment variable access
+    const apiUrl = process.env.REACT_APP_ABOUT;
 
     const [data, setData] = useState(null);
     const [slideOut, setSlideOut] = useState(false); // Added state for slideOut
@@ -10,7 +10,8 @@ export default function About() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(apiUrl); // Fetch data from API
+                // Fetch data from API
+                const response = await fetch(apiUrl); 
                 if (!response.ok) {
                     throw new Error('Failed to fetch data');
                 }
@@ -23,6 +24,8 @@ export default function About() {
 
         fetchData();
     }, [apiUrl]);
+    // we have to pass the api url into the dependency arr
+    // because 
 
     useEffect(() => {
         const handleScroll = () => {

@@ -1,7 +1,4 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const ProjectSchema = new mongoose.Schema({
     name: String,
@@ -16,28 +13,23 @@ const ProjectSchema = new mongoose.Schema({
     link: String
 });
 
-const Projects = mongoose.model('Projects', ProjectSchema);
-
-mongoose.connect(process.env.MONGO_URI, {})
-    .then(() => {
-        console.log('Connected to MongoDB');
-    }).catch((err) => {
-        console.error('Failed to connect to MongoDB', err);
-    });
+// db name in process.env.MONGO_URI
+const Projects = mongoose.model('Projects', ProjectSchema, 'projects');
 
 export default Projects;
 
 /* test commands
-db.Projects.insertOne({
+
+db.projects.insertOne({
     "name": "Game Sale Discord Bot",
-    "languages": {[
+    "languages": [
         "JavaScript"
-    ]},
-    "tech": {[
+    ],
+    "tech": [
         "NodeJs",
         "discord.js",
         "MongoDB"
-    ]},
+    ],
     "link": "https://github.com/zavierand/steam-bot"
 })
 
