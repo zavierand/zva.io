@@ -13,6 +13,12 @@ import mongoose from 'mongoose';
 import Projects from './models/projects.mjs';
 import About from './models/about.mjs';
 
+// authentication
+import google from 'googleapis'
+
+// import mailing dependency
+import nodemailer from 'nodemailer';
+
 // start our express app to retrieve data from backend
 dotenv.config();
 const app = express();
@@ -37,7 +43,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
 // port num
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT;
 
 // middleware (contact me, etc.)
 app.use(function(req, res, next) {
@@ -45,13 +51,54 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.get('/', async (req, res) => {
-    try {
-        res.status(200).render('hello world');
-    }
-    catch(err) {
-        res.status(500).send({ message: 'server error' })
+// send emails
+app.post('/send-email', (req, res) => {
+    // create email obj to store data from ui
+    const req_email = {
+        firstName: `${req.body.firstName}`,
+        lastName: `${req.body.lastName}`,
+        e_address: `${req.body.e_address}`,
+        subject: `${req.body.subject}`,
+        text: `${req.body.message}`,
     };
+
+    // log to test
+    console.log(req_email);
+
+    const message = {
+        from: req_email.e_address,
+        to: process.env.GMAIL_USERNAME,
+        cc: process.env.GMAIL_CC,
+        subject: req_email.subject,
+        text: req_email.text,
+    };
+
+    // log message to test
+    console.log(message);
+
+    try {
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            auth: {
+                user: process.env.GMAIL_USERNAME,
+                pass: process.env.GMAIL_PASSWORD,
+                clientID: process.env.GOOGLE_CLIENT_ID,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET
+            }
+        });
+
+        transporter.sendMail(message, (err, data) => {
+            if (err) {
+                console.error('Error sending email', err);
+            } else {
+                console.log('Email successfully sent!');
+            }
+        });
+    } catch(err) {
+        console.error('Error sending email', err);
+    }
 });
 
 // middleware for handling blurb
@@ -60,6 +107,7 @@ app.get('/about', async (req, res) => {
     try {
         // create abt me obj and extract info from db
         const abtMe = await About.find();
+        console.log('About Me Section:', abtMe);
         res.json(abtMe);
     } catch (err) {
         console.error('Error retrieving about me', err);
@@ -73,6 +121,7 @@ app.get('/projects', async (req, res) => {
     try {
         // create projects obj and extract info from db
         const projects = await Projects.find();
+        console.log('Retrieved Projects: ', projects);
         res.json(projects);
     } catch(err) {
         console.error('Error retrieving projects', err);

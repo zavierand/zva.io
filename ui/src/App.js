@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import NavBar from './components/Navbar.jsx';
+import Sidebar from './components/Sidebar.jsx';
 import Homepage from './pages/Homepage.jsx';
 import About from './pages/About.jsx';
 import Projects from './pages/Projects.jsx';
@@ -31,10 +32,11 @@ function App() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
+  
   return (
     <div className="App">
       <Homepage />
+      <Sidebar className="z-50" />
       <NavBar slideOut={!showNavbar} />
       <About />
       <Projects />

@@ -1,32 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../components/Card.jsx';
+import EightBitStanding from '../components/EightBitStanding.jsx';
 
 export default function About() {
-    const apiUrl = process.env.REACT_APP_ABOUT;
-
-    const [data, setData] = useState(null);
-    const [slideOut, setSlideOut] = useState(false); // Added state for slideOut
+    const apiURL = process.env.REACT_APP_ABOUT;
+    const [blurb, setBlurb] = useState('My name is Zavier Andrianarivo and I\'m a rising senior studying computer science at NYU');
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch data from API
-                const response = await fetch(apiUrl); 
+                console.log('API URL:', apiURL); // Log the API URL
+                const response = await fetch(apiURL);
                 if (!response.ok) {
-                    throw new Error('Failed to fetch data');
+                    throw new Error('Network response was not ok');
                 }
-                const result = await response.json(); // Parse JSON response
-                setData(result); // Update state with fetched data
-            } catch (error) {
-                console.error('Error fetching data:', error);
+                const data = await response.json();
+                console.log('API Response:', data); // Log the entire response
+
+                if (data.length > 0 && data[0].blurb) {
+                    setBlurb(data[0].blurb); // Update state with fetched data
+                    console.log('Blurb:', data[0].blurb); // Log blurb after setting state
+                } else {
+                    console.error('key does not exist in the response:', data);
+                }
+            } catch (err) {
+                console.error('Error fetching:', err);
             }
         };
 
         fetchData();
-    }, [apiUrl]);
-    // we have to pass the api url into the dependency arr
-    // because 
+    }, [apiURL]);
 
+    const [slideOut, setSlideOut] = useState(false); // Added state for slideOut
+
+    // handle scrolling animation
     useEffect(() => {
         const handleScroll = () => {
             const aboutSection = document.getElementById('about');
@@ -51,14 +58,16 @@ export default function About() {
     }, []);
 
     return (
-        <div className="w-full h-screen bg-[#CDE3F4] relative" id="about">
-            <div className="py-[250px] ml-[90px] text-[#376096] text-8xl font-normal font-['Eurostile']">
+        <div className="w-full h-screen bg-gradient-to-b from-[#12171d] to-[#30363d] relative" id="about">
+            <div className="py-[250px] ml-[90px] text-[#f1ecea] text-8xl font-normal font-['Eurostile']">
                 00 [ABOUT]
             </div>
             <div className="absolute top-[120px] left-0 flex items-center justify-center">
-                <Card data={data} slideOut={slideOut} />
+                <Card data={blurb} slideOut={slideOut} />
+            </div>
+            <div className="mt-[-212px] mx-[1050px]">
+                <EightBitStanding />
             </div>
         </div>
     );
-};
-
+}
