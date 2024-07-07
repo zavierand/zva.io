@@ -12,12 +12,7 @@ import mongoose from 'mongoose';
 // import schemas
 import Projects from './models/projects.mjs';
 import About from './models/about.mjs';
-
-// authentication
-import google from 'googleapis'
-
-// import mailing dependency
-import nodemailer from 'nodemailer';
+import Messages from './models/messagesSchema.mjs'
 
 // start our express app to retrieve data from backend
 dotenv.config();
@@ -26,14 +21,6 @@ const app = express();
 // set index.mjs to default path to retrieve data
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// connect to the db
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log('Connected to MongoDB');
-    }).catch((err) => {
-        console.error('Failed to connect to MongoDB', err);
-    });
 
 // create express app
 app.use(express.json());
@@ -45,61 +32,47 @@ app.use(cors());
 // port num
 const PORT = process.env.PORT;
 
+// connect to the db
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => {
+        console.log('Connected to MongoDB');
+    }).catch((err) => {
+        console.error('Failed to connect to MongoDB', err);
+    });
+
 // middleware (contact me, etc.)
 app.use(function(req, res, next) {
     console.log(req.method, req.path);
     next();
 });
 
-// send emails
-app.post('/send-email', (req, res) => {
-    // create email obj to store data from ui
-    const req_email = {
-        firstName: `${req.body.firstName}`,
-        lastName: `${req.body.lastName}`,
-        e_address: `${req.body.e_address}`,
-        subject: `${req.body.subject}`,
-        text: `${req.body.message}`,
-    };
-
-    // log to test
-    console.log(req_email);
-
-    const message = {
-        from: req_email.e_address,
-        to: process.env.GMAIL_USERNAME,
-        cc: process.env.GMAIL_CC,
-        subject: req_email.subject,
-        text: req_email.text,
-    };
-
-    // log message to test
-    console.log(message);
-
-    try {
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
-            auth: {
-                user: process.env.GMAIL_USERNAME,
-                pass: process.env.GMAIL_PASSWORD,
-                clientID: process.env.GOOGLE_CLIENT_ID,
-                clientSecret: process.env.GOOGLE_CLIENT_SECRET
-            }
+// get and post to same route
+app.route('/messages')
+    .post(async (req, res) => {
+        console.log(req.body, req.method);
+        const message = new Messages({
+            fName: `${req.body.firstName}`,
+            lName: `${req.body.lastName}`,
+            email: `${req.body.email}`,
+            subject: `${req.body.subject}`,
+            message: `${req.body.message}`
         });
 
-        transporter.sendMail(message, (err, data) => {
-            if (err) {
-                console.error('Error sending email', err);
-            } else {
-                console.log('Email successfully sent!');
-            }
-        });
-    } catch(err) {
-        console.error('Error sending email', err);
-    }
-});
+        console.log(message);
+        try{
+            message.save();
+        } catch(err) {
+            console.error('Could not post', err);
+        }
+    })
+    .get(async (req, res) => {
+        try {
+            const contact = await Messages.find();
+            res.json(contact);
+        } catch(err) {
+            console.error('Could not retrieve messages', err);
+        };
+    });
 
 // middleware for handling blurb
 app.get('/about', async (req, res) => {

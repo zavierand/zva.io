@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
 export default function ContactForm() {
-    const emailURL = process.env.REACT_APP_SEND_EMAIL;
+    const messagesURL = process.env.REACT_APP_MESSAGES;
 
     // store data in an object
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
-        e_address: '',
+        email: '',
         subject: '',
         message: '',
     });
@@ -23,7 +23,7 @@ export default function ContactForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try { 
-            const res = fetch(emailURL, {
+            const res = fetch(messagesURL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -31,7 +31,7 @@ export default function ContactForm() {
                 body: JSON.stringify(formData)
             });
             if (res) {
-                alert('Email sent successfully!');
+                alert('Message sent!');
             } else {
                 throw new Error('Failed to send email');
             }
@@ -41,12 +41,12 @@ export default function ContactForm() {
         }
 
         console.log(formData);
-        console.log(emailURL);
+        console.log(messagesURL);
     };
 
     return (
         <div className="w-full flex justify-center items-center font-['Eurostile']">
-            <form onSubmit={handleSubmit} action="/send-email" method="post" className="p-8 rounded-md w-full max-w-2xl">
+            <form onSubmit={handleSubmit} action="/messages" method="post" className="p-8 rounded-md w-full max-w-2xl">
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                     <div className="flex flex-col mb-4">
                         <label className="mb-2 text-white">FIRST NAME:</label>
@@ -58,7 +58,7 @@ export default function ContactForm() {
                     </div>
                     <div className="flex flex-col mb-4">
                         <label className="mb-2 text-white">EMAIL:</label>
-                        <input type="email" name="e_address" value={formData.e_address} onChange={handleChange} required className="p-2 border rounded-md bg-transparent text-white" />
+                        <input type="email" name="email" value={formData.e_address} onChange={handleChange} required className="p-2 border rounded-md bg-transparent text-white" />
                     </div>
                 </div>
                 <div className="flex flex-col mb-4">
